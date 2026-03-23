@@ -4,6 +4,17 @@ node_modules/
 dist/
 build/
 coverage/
+.venv/
+.uv-cache/
+.playwright/
+.pytest_cache/
+.mypy_cache/
+__pycache__/
+.pycache/
+.tmp/
+.state/
+screenshots/
 .env
 .env.*
 *.log
+.idea/

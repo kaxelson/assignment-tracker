@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "academic-command-center"
+version = "0.1.0"
+description = "Aggregate D2L coursework into a single planning workflow."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "alembic>=1.13,<2",
+  "aiosqlite>=0.20,<1",
+  "fastapi>=0.115,<1",
+  "playwright>=1.48,<2",
+  "pydantic-settings>=2.6,<3",
+  "sqlalchemy[asyncio]>=2.0,<3",
+  "structlog>=24.4,<25",
+  "uvicorn[standard]>=0.32,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.28,<1",
+  "pytest>=8.3,<9",
+  "pytest-asyncio>=0.24,<1",
+]
+
+[project.scripts]
+acc = "acc.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/acc"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
