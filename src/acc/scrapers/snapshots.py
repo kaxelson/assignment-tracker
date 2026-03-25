@@ -14,6 +14,18 @@ class D2LUpcomingEvent(BaseModel):
     details_url: str | None = None
 
 
+class D2LAnnouncementItem(BaseModel):
+    title: str
+    url: str | None = None
+
+
+class D2LAnnouncement(BaseModel):
+    title: str
+    url: str
+    posted_at_text: str | None = None
+    items: list[D2LAnnouncementItem] = Field(default_factory=list)
+
+
 class D2LGradeSummary(BaseModel):
     weight_achieved_text: str | None = None
     grade_text: str | None = None
@@ -48,9 +60,12 @@ class D2LCourseSnapshot(BaseModel):
     final_calculated_grade: D2LGradeSummary | None = None
     tool_links: list[D2LToolLink] = Field(default_factory=list)
     upcoming_events: list[D2LUpcomingEvent] = Field(default_factory=list)
+    announcements: list[D2LAnnouncement] = Field(default_factory=list)
     grade_rows: list[D2LGradeRow] = Field(default_factory=list)
     syllabus_topics: list[D2LContentTopic] = Field(default_factory=list)
     external_tools: list[D2LContentTopic] = Field(default_factory=list)
+    # Weekly / chapter content pages (graded tasks, extra credit, etc.) scraped from Content.
+    content_outline_topics: list[D2LContentTopic] = Field(default_factory=list)
 
 
 class D2LDashboardSnapshot(BaseModel):
@@ -88,3 +103,34 @@ class ExternalScrapeSnapshot(BaseModel):
     fetched_at: datetime
     courses: list[ExternalCourseSnapshot]
     assignments: list[ExternalAssignmentSnapshot]
+
+
+class CrawlArtifact(BaseModel):
+    id: str
+    course_id: str
+    course_code: str
+    source_platform: str
+    artifact_type: str
+    page_kind: str
+    title: str | None = None
+    url: str | None = None
+    parent_url: str | None = None
+    fetched_at: datetime
+    html_path: str | None = None
+    text_path: str | None = None
+    screenshot_path: str | None = None
+    metadata: dict[str, object] = Field(default_factory=dict)
+
+
+class CrawlCourseSnapshot(BaseModel):
+    course_id: str
+    code: str
+    name: str
+    artifact_count: int = 0
+
+
+class CrawlSnapshot(BaseModel):
+    fetched_at: datetime
+    artifacts_dir: str
+    courses: list[CrawlCourseSnapshot]
+    artifacts: list[CrawlArtifact]

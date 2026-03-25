@@ -1,6 +1,8 @@
 from acc.scrapers.d2l import (
     build_due_text,
+    content_module_has_schedule_hints,
     detect_external_platform,
+    extract_announcement_posted_at_text,
     extract_course_id,
     parse_content_type,
     parse_course_link_text,
@@ -33,6 +35,11 @@ def test_build_due_text() -> None:
     assert due_text == "MAR 22 11:59 PM"
 
 
+def test_extract_announcement_posted_at_text() -> None:
+    text = "What to do the 10th week? Hector Hernandez posted on Mar 23, 2026 12:01 AM Edited"
+    assert extract_announcement_posted_at_text(text) == "Mar 23, 2026 12:01 AM"
+
+
 def test_parse_content_type_from_d2l_topic_title() -> None:
     assert parse_content_type("'PHY 221-001 Syllabus' - Word Document") == "Word Document"
     assert parse_content_type("'Mastering Assignments' - External Learning Tool") == (
@@ -43,6 +50,15 @@ def test_parse_content_type_from_d2l_topic_title() -> None:
 def test_detect_external_platform() -> None:
     assert detect_external_platform("Cengage MindTap") == "cengage_mindtap"
     assert detect_external_platform("Mastering Assignments") == "pearson_mylab"
+
+
+def test_content_module_has_schedule_hints() -> None:
+    assert content_module_has_schedule_hints("Week 6")
+    assert content_module_has_schedule_hints("GRADES TASKS - CH05")
+    assert content_module_has_schedule_hints("Graded Tasks - Chapter 5")
+    assert content_module_has_schedule_hints("Extra Credit Opportunities")
+    assert not content_module_has_schedule_hints("Start Here")
+    assert not content_module_has_schedule_hints("Instructor Information")
 
 
 def test_trim_document_preamble() -> None:

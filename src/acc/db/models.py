@@ -39,6 +39,7 @@ class Course(Base):
     )
 
     assignments: Mapped[list["Assignment"]] = relationship(back_populates="course")
+    provenance_events: Mapped[list["ProvenanceEvent"]] = relationship(back_populates="course")
 
 
 class Assignment(Base):
@@ -78,6 +79,30 @@ class Assignment(Base):
 
     course: Mapped["Course"] = relationship(back_populates="assignments")
     agenda_entries: Mapped[list["AgendaEntry"]] = relationship(back_populates="assignment")
+    provenance_events: Mapped[list["ProvenanceEvent"]] = relationship(back_populates="assignment")
+
+
+class ProvenanceEvent(Base):
+    """Audit trail: where dashboard values came from (URLs, artifacts, LLM rationale JSON)."""
+
+    __tablename__ = "provenance_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    course_id: Mapped[str | None] = mapped_column(
+        String(50), ForeignKey("courses.id", ondelete="SET NULL"), nullable=True
+    )
+    assignment_id: Mapped[str | None] = mapped_column(
+        String(100), ForeignKey("assignments.id", ondelete="SET NULL"), nullable=True
+    )
+    stage: Mapped[str] = mapped_column(String(64))
+    source_url: Mapped[str | None] = mapped_column(Text)
+    artifact_ref: Mapped[str | None] = mapped_column(Text)
+    text_preview: Mapped[str | None] = mapped_column(Text)
+    detail: Mapped[dict | None] = mapped_column(JSON)
+
+    course: Mapped["Course | None"] = relationship(back_populates="provenance_events")
+    assignment: Mapped["Assignment | None"] = relationship(back_populates="provenance_events")
 
 
 class AgendaEntry(Base):
